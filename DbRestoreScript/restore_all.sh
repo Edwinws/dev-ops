@@ -18,9 +18,13 @@ export $(egrep -v '^#' $DIR/.env | xargs)
 
 ## Delete old backups
 echo "Deleting existing backup files..."
-rm *.sql
-rm *.tar.bz2
-rm -r ${MONGO_BACKUP_FOLDER}
+if [ "$(find . -maxdepth 1 -type f | grep -i '.*\.sql$')" ]; then
+    rm -f *.sql
+fi
+if [ "$(find . -maxdepth 1 -type f | grep -i '.*\.tar.bz2$')" ]; then
+    rm -f *.tar.bz2
+fi
+rm -rf ${MONGO_BACKUP_FOLDER}
 
 ## Download Backup Files
 echo "Downloading backup files..."
