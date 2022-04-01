@@ -64,6 +64,7 @@ mongorestore \
     ${MONGO_PASSWORD:+-p "$MONGO_PASSWORD"} \
     ${MONGO_AUTH_DATABASE:+--authenticationDatabase="$MONGO_AUTH_DATABASE"} \
     -d ${MONGO_DATABASE} ${MONGO_BACKUP_FOLDER} \
+    --numParallelCollections=${NUM_PARALLEL_COLLECTIONS}
     --gzip
 
 echo "Changing all user password to 'asdf'..."
