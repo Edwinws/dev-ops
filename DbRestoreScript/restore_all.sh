@@ -99,6 +99,7 @@ mysql \
 	-h ${MYSQL_HOST} \
 	-u${MYSQL_USER} \
 	${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
+	--max-allowed-packet=1073741824 \
 	${MYSQL_APPROVAL_DATABASE} < ${APPROVAL_FILENAME}
 
 ## Bifrost
@@ -121,6 +122,7 @@ mysql \
 	-h ${MYSQL_HOST} \
 	-u${MYSQL_USER} \
 	${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
+	--max-allowed-packet=1073741824 \
 	${MYSQL_BIFROST_DATABASE} < ${BIFROST_FILENAME}
 
 echo "Creating secret in Bifrost..."
