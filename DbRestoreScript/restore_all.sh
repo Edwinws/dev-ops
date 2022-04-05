@@ -48,9 +48,9 @@ pv ${MONGO_FILENAME} | tar -xjf -
 
 echo "Dropping metabuyer database..."
 mongo \
-	--host ${MONGO_HOST} \
-	--port ${MONGO_PORT} \
-	${MONGO_USERNAME:+-u "$MONGO_USERNAME"} \
+    --host ${MONGO_HOST} \
+    --port ${MONGO_PORT} \
+    ${MONGO_USERNAME:+-u "$MONGO_USERNAME"} \
     ${MONGO_PASSWORD:+-p "$MONGO_PASSWORD"} \
     ${MONGO_AUTH_DATABASE:+--authenticationDatabase="$MONGO_AUTH_DATABASE"} \
     ${MONGO_DATABASE} \
@@ -59,9 +59,9 @@ mongo \
 
 echo "Restoring Mongo backup..."
 mongorestore \
-	--host ${MONGO_HOST} \
-	--port ${MONGO_PORT} \
-	${MONGO_USERNAME:+-u "$MONGO_USERNAME"} \
+    --host ${MONGO_HOST} \
+    --port ${MONGO_PORT} \
+    ${MONGO_USERNAME:+-u "$MONGO_USERNAME"} \
     ${MONGO_PASSWORD:+-p "$MONGO_PASSWORD"} \
     ${MONGO_AUTH_DATABASE:+--authenticationDatabase="$MONGO_AUTH_DATABASE"} \
     -d ${MONGO_DATABASE} ${MONGO_BACKUP_FOLDER} \
@@ -70,9 +70,9 @@ mongorestore \
 
 echo "Changing all user password to 'asdf'..."
 mongo \
-	--host ${MONGO_HOST} \
-	--port ${MONGO_PORT} \
-	${MONGO_USERNAME:+-u "$MONGO_USERNAME"} \
+    --host ${MONGO_HOST} \
+    --port ${MONGO_PORT} \
+    ${MONGO_USERNAME:+-u "$MONGO_USERNAME"} \
     ${MONGO_PASSWORD:+-p "$MONGO_PASSWORD"} \
     ${MONGO_AUTH_DATABASE:+--authenticationDatabase="$MONGO_AUTH_DATABASE"} \
     ${MONGO_DATABASE} \
@@ -83,75 +83,75 @@ mongo \
 ## Approval
 echo "Restoring Approval Engine..."
 mysql \
-	-h ${MYSQL_HOST} \
-	-u${MYSQL_USER} \
-	${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
-	--execute="DROP SCHEMA IF EXISTS ${MYSQL_APPROVAL_DATABASE}; CREATE SCHEMA ${MYSQL_APPROVAL_DATABASE};"
+    -h ${MYSQL_HOST} \
+    -u${MYSQL_USER} \
+    ${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
+    --execute="DROP SCHEMA IF EXISTS ${MYSQL_APPROVAL_DATABASE}; CREATE SCHEMA ${MYSQL_APPROVAL_DATABASE};"
 
 if [ "$(uname)" = "Darwin" ]
 then
-	sed -i "" "/^CREATE DATABASE /d" ${APPROVAL_FILENAME}
-	sed -i "" "/^USE /d" ${APPROVAL_FILENAME}
+    sed -i "" "/^CREATE DATABASE /d" ${APPROVAL_FILENAME}
+    sed -i "" "/^USE /d" ${APPROVAL_FILENAME}
 else
-	sed -i "/^CREATE DATABASE /d" ${APPROVAL_FILENAME}
-	sed -i "/^USE /d" ${APPROVAL_FILENAME}
+    sed -i "/^CREATE DATABASE /d" ${APPROVAL_FILENAME}
+    sed -i "/^USE /d" ${APPROVAL_FILENAME}
 fi
 
 mysql \
-	-h ${MYSQL_HOST} \
-	-u${MYSQL_USER} \
-	${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
-	--max-allowed-packet=1073741824 \
-	${MYSQL_APPROVAL_DATABASE} < ${APPROVAL_FILENAME}
+    -h ${MYSQL_HOST} \
+    -u${MYSQL_USER} \
+    ${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
+    --max-allowed-packet=1073741824 \
+    ${MYSQL_APPROVAL_DATABASE} < ${APPROVAL_FILENAME}
 
 echo "Updating oauth_clients table..."
 mysql \
-	-h ${MYSQL_HOST} \
-	-u${MYSQL_USER} \
-	${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
-	--execute="UPDATE ${MYSQL_APPROVAL_DATABASE}.oauth_clients SET secret = \"${APPROVAL_OAUTH_SECRET}\""
+    -h ${MYSQL_HOST} \
+    -u${MYSQL_USER} \
+    ${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
+    --execute="UPDATE ${MYSQL_APPROVAL_DATABASE}.oauth_clients SET secret = \"${APPROVAL_OAUTH_SECRET}\""
 ##
 
 ## Bifrost
 echo "Restoring Bifrost..."
 mysql \
-	-h ${MYSQL_HOST} \
-	-u${MYSQL_USER} \
-	${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
-	--execute="DROP SCHEMA IF EXISTS ${MYSQL_BIFROST_DATABASE}; CREATE SCHEMA ${MYSQL_BIFROST_DATABASE}"
+    -h ${MYSQL_HOST} \
+    -u${MYSQL_USER} \
+    ${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
+    --execute="DROP SCHEMA IF EXISTS ${MYSQL_BIFROST_DATABASE}; CREATE SCHEMA ${MYSQL_BIFROST_DATABASE}"
 
 if [ "$(uname)" = "Darwin" ]
 then
-	sed -i "" "/^CREATE DATABASE /d" ${BIFROST_FILENAME}
-	sed -i "" "/^USE /d" ${BIFROST_FILENAME}
+    sed -i "" "/^CREATE DATABASE /d" ${BIFROST_FILENAME}
+    sed -i "" "/^USE /d" ${BIFROST_FILENAME}
 else
-	sed -i "/^CREATE DATABASE /d" ${BIFROST_FILENAME}
-	sed -i "/^USE /d" ${BIFROST_FILENAME}
+    sed -i "/^CREATE DATABASE /d" ${BIFROST_FILENAME}
+    sed -i "/^USE /d" ${BIFROST_FILENAME}
 fi
 
 mysql \
-	-h ${MYSQL_HOST} \
-	-u${MYSQL_USER} \
-	${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
-	--max-allowed-packet=1073741824 \
-	${MYSQL_BIFROST_DATABASE} < ${BIFROST_FILENAME}
+    -h ${MYSQL_HOST} \
+    -u${MYSQL_USER} \
+    ${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
+    --max-allowed-packet=1073741824 \
+    ${MYSQL_BIFROST_DATABASE} < ${BIFROST_FILENAME}
 
 echo "Creating secret in Bifrost..."
 mysql \
-	-h ${MYSQL_HOST} \
-	-u${MYSQL_USER} \
-	${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
-	--execute="TRUNCATE ${MYSQL_BIFROST_DATABASE}.configurations;"
+    -h ${MYSQL_HOST} \
+    -u${MYSQL_USER} \
+    ${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
+    --execute="TRUNCATE ${MYSQL_BIFROST_DATABASE}.configurations;"
 
 mysql \
-	-h ${MYSQL_HOST} \
-	-u${MYSQL_USER} \
+    -h ${MYSQL_HOST} \
+    -u${MYSQL_USER} \
     --max-allowed-packet=1073741824 \
-	${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
-	${MYSQL_BIFROST_DATABASE} << "EOF"
+    ${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
+    ${MYSQL_BIFROST_DATABASE} << "EOF"
 INSERT INTO configurations
 VALUES
-	(1, "integration_secret", "{\"secret\": \"secret\"}", 1, 1, now(), now(), NULL, NULL);
+    (1, "integration_secret", "{\"secret\": \"secret\"}", 1, 1, now(), now(), NULL, NULL);
 EOF
 ##
 
