@@ -104,6 +104,14 @@ mysql \
 	--max-allowed-packet=1073741824 \
 	${MYSQL_APPROVAL_DATABASE} < ${APPROVAL_FILENAME}
 
+echo "Updating oauth_clients table..."
+mysql \
+	-h ${MYSQL_HOST} \
+	-u${MYSQL_USER} \
+	${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
+	--execute="UPDATE ${MYSQL_APPROVAL_DATABASE}.oauth_clients SET secret = \"${APPROVAL_OAUTH_SECRET}\""
+##
+
 ## Bifrost
 echo "Restoring Bifrost..."
 mysql \
