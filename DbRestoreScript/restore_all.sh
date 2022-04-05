@@ -138,6 +138,7 @@ mysql \
 mysql \
 	-h ${MYSQL_HOST} \
 	-u${MYSQL_USER} \
+    --max-allowed-packet=1073741824 \
 	${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
 	${MYSQL_BIFROST_DATABASE} << "EOF"
 INSERT INTO configurations
