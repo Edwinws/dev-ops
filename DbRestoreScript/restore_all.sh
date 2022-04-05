@@ -25,6 +25,7 @@ if [ "$(find . -maxdepth 1 -type f | grep -i '.*\.tar.bz2$')" ]; then
     rm -f *.tar.bz2
 fi
 rm -rf ${MONGO_BACKUP_FOLDER}
+##
 
 ## Download Backup Files
 echo "Downloading backup files..."
@@ -84,6 +85,7 @@ echo "Restoring Approval Engine..."
 mysql \
 	-h ${MYSQL_HOST} \
 	-u${MYSQL_USER} \
+	${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
 	--execute="DROP SCHEMA IF EXISTS ${MYSQL_APPROVAL_DATABASE}; CREATE SCHEMA ${MYSQL_APPROVAL_DATABASE};"
 
 if [ "$(uname)" = "Darwin" ]
@@ -107,6 +109,7 @@ echo "Restoring Bifrost..."
 mysql \
 	-h ${MYSQL_HOST} \
 	-u${MYSQL_USER} \
+	${MYSQL_PASSWORD:+-p"$MYSQL_PASSWORD"} \
 	--execute="DROP SCHEMA IF EXISTS ${MYSQL_BIFROST_DATABASE}; CREATE SCHEMA ${MYSQL_BIFROST_DATABASE}"
 
 if [ "$(uname)" = "Darwin" ]
