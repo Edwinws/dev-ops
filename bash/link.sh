@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # recursively create symlinks of all executable files in the current directory to $HOME/.local/bin except current file
 for file in *; do
