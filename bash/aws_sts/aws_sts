@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+set -e
+
+# cd, following symlink https://stackoverflow.com/a/51651602/1014038
+cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+
+source ../utils/cecho.sh
+
+if [[ ! -f env.json ]]; then
+    cecho "RED" "env.json file not found, please make a copy of .env.json.example and modify accordingly."
+    exit 1
+fi
+
+# Load the keys of the aws_mfa_serial_numbers object as variables
+declare -A available_environments
+while IFS="=" read -r key value
+do
+    available_environments[$key]="$value"
+done < <(jq -r '.aws_mfa_serial_numbers | to_entries | map("\(.key)=\(.value)") | .[]' env.json)
+
+function print_usage() {
+    echo "Usage: aws_sts <environment> <mfa token>"
+    echo "Available values for <environment>: ${!available_environments[*]}"
+}
+
+# check if $1 is in the $available_environments array
+if [[ -z $1 || -z "${available_environments[$1]}" ]]; then
+    cecho "RED" "Select an environment"
+    print_usage
+    exit 1
+fi
+
+if [[ -z $2 ]]; then
+    cecho "RED" "Provide a token"
+    print_usage
+    exit 1
+fi
+
+environment=$1
+mfa_token=$2
+mfa_serial_number=${available_environments[$environment]}
+mfaBlockName="mfa-${environment}"
+
+echo "Generating temporary tokens for AWS CLI..."
+
+token=$(
+    aws sts get-session-token \
+        --duration 86400 \
+        --serial-number "${mfa_serial_number}" \
+        --profile="${environment}" \
+        --token-code "${mfa_token}"
+)
+
+aws_access_key_id=$(echo "$token" | jq --raw-output '.Credentials.AccessKeyId')
+aws_secret_access_key=$(echo "$token" | jq --raw-output '.Credentials.SecretAccessKey')
+aws_session_token=$(echo "$token" | jq --raw-output '.Credentials.SessionToken')
+
+# Remove the mfa block
+sed -i '' -e "/^\[${mfaBlockName}\]/,/^$/d" ~/.aws/credentials
+
+OUTPUT=$(
+    printf "%s\n%s\n%s\n%s\n" \
+        "[${mfaBlockName}]" \
+        "aws_access_key_id = $aws_access_key_id" \
+        "aws_secret_access_key = $aws_secret_access_key" \
+        "aws_session_token = $aws_session_token"
+)
+
+echo "$OUTPUT" >>~/.aws/credentials
+echo "Successfully saved token information into ~/.aws/credentials"
