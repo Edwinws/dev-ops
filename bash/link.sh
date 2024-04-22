@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
-# recursively create symlinks of all executable files in the current directory to $HOME/.local/bin except current file
-for file in *; do
-    if [ "$file" = "$(basename "$0")" ]; then
+# create symlinks of all executable files in the current directory (recursive) to $HOME/.local/bin except current file using find
+find . -type f | while read -r file
+do
+    if [ "$file" = "$0" ]; then
         continue
     fi
 
-    if [ -x "$file" ]; then
-        ln -s -f "$(pwd)/$file" "$HOME/.local/bin/$file"
+    if [[ -x $file ]]; then
+        ln -s -f "$(realpath "$file")" "$HOME/.local/bin/$(basename "$file")"
     fi
 done
