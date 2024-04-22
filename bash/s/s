@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -e
+
+# cd, following symlink https://stackoverflow.com/a/51651602/1014038
+cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+
+source ../utils/cecho.sh
+
+if [[ ! -f env.json ]]; then
+    cecho "RED" "env.json file not found, please make a copy of .env.json.example and modify accordingly."
+    exit 1
+fi
+
+declare -A available_environments
+while IFS="=" read -r key value; do
+    available_environments[$key]="$value"
+done < <(jq -r '.ssh_servers | to_entries | .[] | .key as $parent | .value[] | "\($parent)_\(.name)=\(.hostname)"' env.json)
+
+function print_usage() {
+    usage_message="Usage: $(basename "$0") <environment>\n"
+    usage_message+="Available values for <environment>:\n"
+    for key in "${!available_environments[@]}"; do
+        usage_message+="- ${key#*_}\n"
+    done
+
+    # shellcheck disable=SC2015
+    printf "%b" "$usage_message" |
+        (command -v cowsay &>/dev/null && cowsay -n || cat) |
+        (command -v lolcat &>/dev/null && lolcat || cat)
+
+}
+
+# # check if $1 is in the $available_environments array
+# if [[ -z $1 || -z "${available_environments[$1]}" ]]; then
+#     cecho "RED" "Specify an instance:"
+#     print_usage
+#     exit 1
+# fi
+
+# TODO: Restructure $available_environments:
+# - remove prefix, cant check easily with it
+# - create another array of prod environments and use that to check if the server is prod
