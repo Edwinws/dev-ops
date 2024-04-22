@@ -20,7 +20,7 @@ do
 done < <(jq -r '.aws_mfa_serial_numbers | to_entries | map("\(.key)=\(.value)") | .[]' env.json)
 
 function print_usage() {
-    echo "Usage: aws_sts <environment> <mfa token>"
+    echo "Usage: $(basename "$0") <environment> <mfa token>"
     echo "Available values for <environment>: ${!available_environments[*]}"
 }
 
