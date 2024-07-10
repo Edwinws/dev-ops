@@ -1,0 +1,15 @@
+#!/bin/sh
+
+APPLICATION_PACKAGE_MANAGER=pnpm
+APPLICATION_NPM_VERSION=v18
+APPLICATION_PORT=3121
+APPLICATION_FOLDER_NAME=$(basename "$(pwd)")
+
+echo "Serving ${APPLICATION_FOLDER_NAME} at localhost:${APPLICATION_PORT}" | cowsay | lolcat
+echo ""
+
+tabset -b "${APPLICATION_FOLDER_NAME} - ${APPLICATION_PORT}"
+
+. ~/.nvm/nvm.sh
+nvm use ${APPLICATION_NPM_VERSION}
+${APPLICATION_PACKAGE_MANAGER} run start:dev
